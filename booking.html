@@ -33,17 +33,20 @@
       align-items: center;
       justify-content: center;
       width: 100%;
-      z-index: 2;
+      position: relative;
+      z-index: 5;
+      padding-bottom: 60px;
     }
     .booking-content {
       width: 100%;
-      max-width: 540px;
+      max-width: 920px;
       text-align: center;
       margin: 0 auto;
     }
     .booking-card {
       text-align: left;
       margin-top: 24px;
+      margin-bottom: 40px;
     }
   </style>
 </head>
@@ -100,22 +103,95 @@
           
           <div class="booking-card" data-reveal data-delay="150">
             <form class="booking-form" id="booking-form" novalidate>
-              <div class="form-group">
-                <label for="fullName" class="form-label">Full Name</label>
-                <input type="text" id="fullName" name="name" class="form-input" placeholder="John Doe" required autocomplete="name" />
+              <div class="booking-grid-layout">
+                <!-- Left Panel: Date & Time Selectors -->
+                <div class="booking-selector-panel">
+                  <div class="selector-section">
+                    <label class="form-label font-bold text-accent">1. Select Date</label>
+                    <div class="calendar-container">
+                      <div class="calendar-header">
+                        <button type="button" class="calendar-nav-btn" id="prev-month-btn" aria-label="Previous month">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                        </button>
+                        <span class="calendar-month-year" id="calendar-month-year">July 2026</span>
+                        <button type="button" class="calendar-nav-btn" id="next-month-btn" aria-label="Next month">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                        </button>
+                      </div>
+                      <div class="calendar-weekdays">
+                        <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+                      </div>
+                      <div class="calendar-days" id="calendar-days">
+                        <!-- Dynamically populated -->
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="selector-section">
+                    <div class="time-header-row">
+                      <label class="form-label font-bold text-accent" style="margin-bottom: 0;">2. Select Time</label>
+                      <div class="custom-select-container" id="timezone-select-container">
+                        <div class="custom-select-trigger" id="timezone-select-trigger">
+                          <svg class="timezone-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px; opacity: 0.8;"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                          <span class="custom-select-text" id="timezone-display-text">UTC</span>
+                          <svg class="chevron-icon" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                        </div>
+                        <div class="custom-select-options" id="timezone-options-container">
+                          <div class="custom-option" data-value="Asia/Kolkata">India (IST)</div>
+                          <div class="custom-option" data-value="America/New_York">US Eastern (EST)</div>
+                          <div class="custom-option" data-value="America/Los_Angeles">US Pacific (PST)</div>
+                          <div class="custom-option" data-value="Europe/London">UK (GMT/BST)</div>
+                          <div class="custom-option" data-value="UTC">UTC</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="time-slots-container">
+                      <div class="time-slots-grid" id="time-slots-grid">
+                        <div class="time-slots-placeholder">Please select a date first</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Right Panel: Booking Details -->
+                <div class="booking-details-panel">
+                  <label class="form-label font-bold text-accent">3. Enter Details</label>
+                  <div class="form-group">
+                    <label for="fullName" class="form-label">Full Name</label>
+                    <input type="text" id="fullName" name="name" class="form-input" placeholder="John Doe" required autocomplete="name" />
+                  </div>
+                  <div class="form-group">
+                    <label for="email" class="form-label">Email Address</label>
+                    <input type="email" id="email" name="email" class="form-input" placeholder="john@example.com" required autocomplete="email" />
+                  </div>
+                  <div class="form-group">
+                    <label for="phone" class="form-label">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" class="form-input" placeholder="+1 (555) 000-0000" autocomplete="tel" />
+                  </div>
+                  
+                  <!-- Hidden inputs for validation & Web3Forms payload -->
+                  <input type="hidden" id="selectedDate" name="selectedDate" required />
+                  <input type="hidden" id="selectedTime" name="selectedTime" required />
+                  <input type="hidden" id="selectedTimezone" name="selectedTimezone" required />
+                  
+                  <div class="selection-summary" id="selection-summary">
+                    <div class="summary-card">
+                      <div class="summary-card-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                      </div>
+                      <div class="summary-card-details">
+                        <div class="summary-title">Selected Appointment</div>
+                        <div class="summary-text" id="summary-text">Choose a date and time from the picker.</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button type="submit" class="btn btn-primary btn-lg btn-full" id="booking-submit-btn">
+                    Book Appointment
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                  </button>
+                </div>
               </div>
-              <div class="form-group">
-                <label for="email" class="form-label">Email Address</label>
-                <input type="email" id="email" name="email" class="form-input" placeholder="john@example.com" required autocomplete="email" />
-              </div>
-              <div class="form-group">
-                <label for="phone" class="form-label">Phone Number</label>
-                <input type="tel" id="phone" name="phone" class="form-input" placeholder="+1 (555) 000-0000" autocomplete="tel" />
-              </div>
-              <button type="submit" class="btn btn-primary btn-lg btn-full" id="booking-submit-btn">
-                Book Appointment
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-              </button>
             </form>
             <div class="form-success" id="form-success" aria-live="polite">
               <div class="success-check">
@@ -125,12 +201,17 @@
               <p>Thank you for reaching out. I'll get back to you within 24 hours.</p>
             </div>
           </div>
+
+          <div class="booking-note" data-reveal data-delay="200">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align: middle; margin-right: 8px; color: var(--accent-dark); flex-shrink: 0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            <span>After booking, we'll schedule a call at your preferred date and time to discuss your website design and development goals in detail.</span>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- ═══════════════════ FOOTER ═══════════════════ -->
-    <footer class="footer" id="footer" style="border: none; background: transparent; z-index: 2; margin-top: 40px; padding: 0;">
+    <footer class="footer" id="footer" style="border: none; background: transparent; z-index: 1; margin-top: 80px; padding: 0; position: relative;">
       <div class="container">
         <p class="footer-text" style="margin-bottom: 0;">&copy; 2026 V Uday. All Rights Reserved.</p>
       </div>
