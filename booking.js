@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════
-   V UDAY — PREMIUM PORTFOLIO
-   Ultimate Shockwave Interactions & Animations
+   V UDAY — BOOKING PAGE
+   Dedicated Page Interaction, Validation & Animations
    ═══════════════════════════════════════════════════════════ */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -120,24 +120,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }, { passive: true });
 
     const updateCursor = () => {
-      // Lerp positioning
       currentX += (mouseX - currentX) * 0.16;
       currentY += (mouseY - currentY) * 0.16;
 
-      // Calculate speed and angle for organic stretch
       const dx = currentX - lastX;
       const dy = currentY - lastY;
-      speed = Math.min(Math.hypot(dx, dy) * 1.8, 110); // clamp stretch factor
+      speed = Math.min(Math.hypot(dx, dy) * 1.8, 110);
       angle = Math.atan2(dy, dx) * 180 / Math.PI;
 
       lastX = currentX;
       lastY = currentY;
 
-      // Stretch scales: stretch X-axis with speed, squeeze Y-axis
       const scaleX = isHovered ? 1.8 : 1 + (speed / 120);
       const scaleY = isHovered ? 1.8 : 1 - (speed / 200);
 
-      // Render mercury stretch transform
       cursor.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) rotate(${angle}deg) scale3d(${scaleX}, ${scaleY}, 1)`;
 
       requestAnimationFrame(updateCursor);
@@ -145,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(updateCursor);
 
     // Interactive Hover Snap classes
-    const interactiveElements = document.querySelectorAll('a, button, .service-card, .feature-card, .about-card, input, textarea');
+    const interactiveElements = document.querySelectorAll('a, button, .booking-card, input, textarea');
     interactiveElements.forEach(el => {
       el.addEventListener('mouseenter', () => {
         isHovered = true;
@@ -157,70 +153,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
   }
-
-  // ─── DYNAMIC SCROLL-LINKED VECTOR FLUID FIELD (Canvas Backdrop) ───
-  const canvas = document.getElementById('hero-canvas');
-  if (canvas) {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    window.addEventListener('resize', () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }, { passive: true });
-  }
-
-  // ─── 3D TILT & METALLIC SHINE ───
-  const interactiveCards = document.querySelectorAll('.service-card, .feature-card, .about-card');
-  
-  interactiveCards.forEach(card => {
-    let rect = card.getBoundingClientRect();
-    const updateRect = () => { rect = card.getBoundingClientRect(); };
-    
-    window.addEventListener('resize', updateRect, { passive: true });
-    window.addEventListener('scroll', updateRect, { passive: true });
-    card.addEventListener('mouseenter', () => {
-      updateRect();
-      card.dataset.hovered = "true";
-    });
-
-    card.addEventListener('mousemove', (e) => {
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      
-      card.style.setProperty('--mx', `${x}px`);
-      card.style.setProperty('--my', `${y}px`);
-
-      if (!isTouchDevice) {
-        const xc = rect.width / 2;
-        const yc = rect.height / 2;
-        // Elastic organic tilt angles
-        const tiltX = -(y - yc) / (rect.height / 7);
-        const tiltY = (x - xc) / (rect.width / 7);
-        
-        card.style.transform = `perspective(1200px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale3d(1.025, 1.025, 1.025)`;
-      }
-    });
-
-    card.addEventListener('mouseleave', () => {
-      card.dataset.hovered = "false";
-      card.style.transform = '';
-      card.style.setProperty('--mx', `-999px`);
-      card.style.setProperty('--my', `-999px`);
-    });
-  });
-
-  // ─── SMOOTH SCROLL ───
-  document.querySelectorAll('a[href^="#"]').forEach((a) => {
-    a.addEventListener('click', (e) => {
-      const id = a.getAttribute('href');
-      if (id === '#') return;
-      const el = document.querySelector(id);
-      if (el) {
-        e.preventDefault();
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    });
-  });
 
   // ─── MAGNETIC SNAP ELEMENTS ───
   document.querySelectorAll('.magnetic').forEach((btn) => {
@@ -235,64 +167,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // ─── ANIMATED COUNTERS ───
-  const counters = document.querySelectorAll('[data-count]');
-  let counted = false;
-  const statsSection = document.getElementById('stats');
-
-  function runCounters() {
-    counters.forEach((el) => {
-      const target = parseInt(el.dataset.count);
-      const duration = 2000;
-      const start = performance.now();
-
-      function ease(t) { return t === 1 ? 1 : 1 - Math.pow(2, -10 * t); }
-
-      function tick(now) {
-        const p = Math.min((now - start) / duration, 1);
-        el.textContent = Math.round(ease(p) * target);
-        if (p < 1) requestAnimationFrame(tick);
-      }
-
-      requestAnimationFrame(tick);
-    });
-  }
-
-  if (statsSection) {
-    const counterObs = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !counted) {
-          counted = true;
-          runCounters();
-          counterObs.disconnect();
-        }
-      },
-      { threshold: 0.1 }
-    );
-    counterObs.observe(statsSection);
-  }
-
-  // ─── ACTIVE NAV LINK ───
-  const sections = document.querySelectorAll('section[id]');
-  const navObserver = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const id = entry.target.id;
-          document.querySelectorAll('.nav-link').forEach((l) => {
-            l.classList.toggle('active', l.getAttribute('href') === '#' + id);
-          });
-        }
-      });
-    },
-    { threshold: 0.1, rootMargin: '-80px 0px -50% 0px' }
-  );
-  sections.forEach((s) => navObserver.observe(s));
-
-  // ─── SCROLL INTERACTIONS (Navbar, Progress Bar, Parallax & Background Shapes) ───
+  // ─── SCROLL INTERACTIONS (Navbar, Progress Bar & Background Shapes) ───
   const navbar = document.getElementById('navbar');
   const progressBar = document.getElementById('scroll-progress');
-  const heroGlow = document.querySelector('.hero-glow');
   const shape1 = document.querySelector('.bg-shape-1');
   const shape2 = document.querySelector('.bg-shape-2');
   const shape3 = document.querySelector('.bg-shape-3');
@@ -311,56 +188,32 @@ document.addEventListener('DOMContentLoaded', () => {
       progressBar.style.width = scrollPercent + '%';
     }
 
-    if (heroGlow && !isTouchDevice && scrollY < window.innerHeight) {
-      heroGlow.style.transform = `translate3d(-50%, calc(-55% + ${scrollY * 0.18}px), 0) scale(1)`;
-    }
-
-    // Background shapes complex animations on scroll (Active on mobile/tablet too!)
+    // Background shapes complex animations on scroll
     if (shape1) {
       const transX = scrollY * 0.22;
-      const transY = scrollY * 0.12;
+      const transY = scrollY * -0.4;
       const rot = scrollY * 0.04;
       shape1.style.transform = `translate3d(${transX}px, ${transY}px, 0) rotate(${rot}deg)`;
     }
     if (shape2) {
-      const transX = scrollY * -0.18;
-      const transY = scrollY * 0.06;
+      const transX = scrollY * -0.15;
+      const transY = scrollY * -0.65;
       const scale = 1 + Math.sin(scrollY * 0.0018) * 0.12;
       const rot = scrollY * -0.03;
       shape2.style.transform = `translate3d(${transX}px, ${transY}px, 0) rotate(${rot}deg) scale(${scale})`;
     }
     if (shape3) {
       const transX = Math.sin(scrollY * 0.0012) * 70;
-      const transY = scrollY * 0.04;
+      const transY = scrollY * -0.85;
       const scale = 1 + Math.cos(scrollY * 0.0008) * 0.08;
       shape3.style.transform = `translate3d(${transX}px, ${transY}px, 0) scale(${scale})`;
     }
     if (shape4) {
-      const transX = scrollY * 0.1;
-      const transY = scrollY * -0.04;
+      const transX = scrollY * 0.08;
+      const transY = scrollY * -0.95;
       const rot = scrollY * 0.05;
       const scale = 0.95 + Math.sin(scrollY * 0.0008) * 0.1;
       shape4.style.transform = `translate3d(${transX}px, ${transY}px, 0) rotate(${rot}deg) scale(${scale})`;
-    }
-
-    // Continuous 3D scroll-linked tilt for visible cards (PC only)
-    if (!isTouchDevice) {
-      const vh = window.innerHeight;
-      interactiveCards.forEach(card => {
-        if (card.dataset.hovered === "true") return;
-
-        const cardRect = card.getBoundingClientRect();
-        const cardCenterY = cardRect.top + cardRect.height / 2;
-        const normalizedY = (cardCenterY - vh / 2) / (vh / 2);
-
-        if (cardRect.top < vh && cardRect.bottom > 0) {
-          const tiltAngle = normalizedY * -12;
-          const translateY = normalizedY * 25;
-          card.style.transform = `perspective(1000px) rotateX(${tiltAngle}deg) translateY(${translateY}px) scale(1)`;
-        } else {
-          card.style.transform = '';
-        }
-      });
     }
   }, { passive: true });
 
@@ -385,7 +238,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
-    // Close menu when logo is clicked
     const logo = document.querySelector('.nav-logo');
     if (logo) {
       logo.addEventListener('click', () => {
@@ -396,7 +248,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    // Reset lock when viewport resizes above mobile break
     window.addEventListener('resize', () => {
       if (window.innerWidth > 768) {
         links.classList.remove('open');
@@ -407,5 +258,57 @@ document.addEventListener('DOMContentLoaded', () => {
     }, { passive: true });
   }
 
+  // ─── FORM SUBMISSION ───
+  const form = document.getElementById('booking-form');
+  const success = document.getElementById('form-success');
 
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const btn = form.querySelector('button[type="submit"]');
+      const name = form.querySelector('#fullName').value.trim();
+      const email = form.querySelector('#email').value.trim();
+
+      if (!name || !email) {
+        form.querySelectorAll('.form-input').forEach((inp) => {
+          if (!inp.value.trim() && inp.hasAttribute('required')) {
+            inp.style.borderColor = '#e53e3e';
+            setTimeout(() => (inp.style.borderColor = ''), 2000);
+          }
+        });
+        return;
+      }
+
+      const origHTML = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<span>Sending...</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="spinner"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>';
+
+      try {
+        const response = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            access_key: '1efeeadc-361e-4905-9daa-77ea32aaaa1b',
+            name: name,
+            email: email,
+            phone: form.querySelector('#phone').value.trim(),
+            subject: 'New Appointment Booking from ' + name
+          })
+        });
+
+        if (response.ok) {
+          form.style.display = 'none';
+          success.classList.add('show');
+        } else {
+          throw new Error('Web3Forms returned an error');
+        }
+      } catch (err) {
+        console.error('Submission error:', err);
+        btn.disabled = false;
+        btn.innerHTML = origHTML;
+        alert('Something went wrong. Please try again or email directly.');
+      }
+    });
+  }
 });

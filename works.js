@@ -30,16 +30,74 @@ document.addEventListener('DOMContentLoaded', () => {
   );
   revealElements.forEach((el) => revealObserver.observe(el));
 
-  // ─── NAVBAR SCROLL ───
+  // ─── SCROLL INTERACTIONS (Navbar, Progress Bar, 3D Tilt & Background Shapes) ───
   const navbar = document.getElementById('w-navbar');
-  if (navbar) {
-    let lastScroll = 0;
-    window.addEventListener('scroll', () => {
-      const currentScroll = window.scrollY;
-      navbar.classList.toggle('scrolled', currentScroll > 60);
-      lastScroll = currentScroll;
-    }, { passive: true });
-  }
+  const progressBar = document.getElementById('scroll-progress');
+  const scrollCards = document.querySelectorAll('.project-card, .timeline-card');
+  const shape1 = document.querySelector('.bg-shape-1');
+  const shape2 = document.querySelector('.bg-shape-2');
+  const shape3 = document.querySelector('.bg-shape-3');
+  const shape4 = document.querySelector('.bg-shape-4');
+
+  window.addEventListener('scroll', () => {
+    const scrollY = window.scrollY;
+
+    if (navbar) {
+      navbar.classList.toggle('scrolled', scrollY > 60);
+    }
+
+    if (progressBar) {
+      const windowHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const scrollPercent = windowHeight > 0 ? (scrollY / windowHeight) * 100 : 0;
+      progressBar.style.width = scrollPercent + '%';
+    }
+
+    // Background shapes complex animations on scroll
+    if (shape1) {
+      const transX = scrollY * 0.22;
+      const transY = scrollY * -0.4;
+      const rot = scrollY * 0.04;
+      shape1.style.transform = `translate3d(${transX}px, ${transY}px, 0) rotate(${rot}deg)`;
+    }
+    if (shape2) {
+      const transX = scrollY * -0.15;
+      const transY = scrollY * -0.65;
+      const scale = 1 + Math.sin(scrollY * 0.0018) * 0.12;
+      const rot = scrollY * -0.03;
+      shape2.style.transform = `translate3d(${transX}px, ${transY}px, 0) rotate(${rot}deg) scale(${scale})`;
+    }
+    if (shape3) {
+      const transX = Math.sin(scrollY * 0.0012) * 70;
+      const transY = scrollY * -0.85;
+      const scale = 1 + Math.cos(scrollY * 0.0008) * 0.08;
+      shape3.style.transform = `translate3d(${transX}px, ${transY}px, 0) scale(${scale})`;
+    }
+    if (shape4) {
+      const transX = scrollY * 0.08;
+      const transY = scrollY * -0.95;
+      const rot = scrollY * 0.05;
+      const scale = 0.95 + Math.sin(scrollY * 0.0008) * 0.1;
+      shape4.style.transform = `translate3d(${transX}px, ${transY}px, 0) rotate(${rot}deg) scale(${scale})`;
+    }
+
+    // Continuous 3D scroll-linked tilt for visible cards (PC only)
+    if (!isTouchDevice) {
+      const vh = window.innerHeight;
+      scrollCards.forEach(card => {
+        const cardRect = card.getBoundingClientRect();
+        const cardCenterY = cardRect.top + cardRect.height / 2;
+        const normalizedY = (cardCenterY - vh / 2) / (vh / 2);
+
+        if (cardRect.top < vh && cardRect.bottom > 0) {
+          const tiltAngle = normalizedY * -10;
+          const translateY = normalizedY * 20;
+          card.style.transform = `perspective(1000px) rotateX(${tiltAngle}deg) translateY(${translateY}px) scale(1)`;
+        } else {
+          card.style.transform = '';
+        }
+      });
+    }
+  }, { passive: true });
 
   // ─── MOBILE NAV ───
   const toggle = document.getElementById('w-nav-toggle');
