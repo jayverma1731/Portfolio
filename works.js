@@ -12,6 +12,37 @@ document.addEventListener('DOMContentLoaded', () => {
     img.addEventListener('dragstart', (e) => e.preventDefault());
   });
 
+  // ─── CLEAN URL PATHS & LOCAL PROTOCOL FALLBACK ───
+  try {
+    if (window.location.protocol === 'file:') {
+      document.querySelectorAll('a[href="./"], a[href^="./#"]').forEach(link => {
+        const href = link.getAttribute('href');
+        if (href === './') {
+          link.setAttribute('href', 'index.html');
+        } else if (href.startsWith('./#')) {
+          link.setAttribute('href', 'index.html' + href.substring(2));
+        }
+      });
+    } else {
+      if (window.location.pathname.endsWith('/index.html')) {
+        const cleanPath = window.location.pathname.substring(0, window.location.pathname.length - 10);
+        window.history.replaceState(null, '', cleanPath + window.location.hash);
+      } else if (window.location.pathname.endsWith('index.html')) {
+        window.history.replaceState(null, '', '/' + window.location.hash);
+      }
+    }
+  } catch (e) {
+    console.warn("URL cleaner error:", e);
+  }
+
+  // ─── LOCK PINCH-ZOOM AND DOUBLE-TAP ZOOM (Mobile Safari/Android) ───
+  document.addEventListener('gesturestart', (e) => e.preventDefault(), { passive: false });
+  document.addEventListener('touchstart', (e) => {
+    if (e.touches.length > 1) {
+      e.preventDefault();
+    }
+  }, { passive: false });
+
   const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
   // ─── SCROLL REVEAL ───

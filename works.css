@@ -946,7 +946,10 @@ ul { list-style: none; }
     justify-content: flex-start;
     align-items: center;
     gap: 28px;
-    background: #0a0a0a !important;
+    background: rgba(10, 10, 10, 0.88) !important;
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s var(--ease);
@@ -1266,7 +1269,7 @@ ul { list-style: none; }
 }
 
 /* Ensure content sections sit above shapes */
-.works-hero, .w-section, .w-footer, .w-navbar {
+.works-hero, .w-section, .w-footer {
   position: relative;
   z-index: 2;
 }
